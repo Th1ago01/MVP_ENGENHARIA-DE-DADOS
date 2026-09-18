@@ -13,7 +13,7 @@ Em um ambiente de mercado competitivo, o preço que se paga pela energia deixa d
 Com esse intuito, agreguei os dados brutos disponibilizados pela **Câmara de Comercialização de Energia Elétrica (CCEE)** e o **Operador Nacional do Sistema Elétrico (ONS)** no que diz respeito ao PLD e à situação de geração de cada usina. No dataset disponibilizado pela CCEE possuímos a divisão das regiões do país de acordo com o Sistema Interligado Nacional (SIN) e o PLD calculado/auferido para cada hora de todos os meses, desde 2001; no dataset disponibilizado pela ONS, por outro lado, temos a geração de cada tipo de usina em cada submercado e se esse submercado estava sendo um exportador ou importador de energia, na granularidade horária. 
 
 ### **2 - Carga dos Dados**
-Esta etapa foi realizada na camada BRONZE e o passo a passo pode ser conferido no Notebook **MVP - PUC RIO BRONZE LAYER.ipynb**. 
+Esta etapa foi realizada na camada BRONZE e o passo a passo pode ser conferido em [Estrutura Medallion - Bronze](https://github.com/Th1ago01/MVP_ENGENHARIA-DE-DADOS/blob/main/MVP%20-%20PUC%20RIO%20BRONZE%20LAYER.ipynb). 
 O processo completo foi realizado consumindo recursos específicos da CCEE e da ONS para estes tipos de informação. No total, foram ingeridos três datasets nesta etapa:
 
 **2.1 - DADOS DO BALANÇO DE ENERGIA NOS SUBSISTEMAS (2000-2026)** : dados horários de balanço de energia por subsistema da ONS, obtidos via requisição HTTP direta a arquivos Parquets, disponibilizados no Open Data da ONS (https://dados.ons.org.br/dataset/balanco-energia-subsistema);
@@ -29,9 +29,11 @@ Em todos os casos, os dados foram normalizados para tipo string para evitar conf
 ### **3 - Modelagem e Catálogo de Dados**
 A modelagem dos dados foi estruturada nas camadas seguintes à Bronze, respeitando a arquitetura Medallion, nas camadas Silver e Gold. 
 
-Na camada Silver, os dados brutos, e que haviam sido convertidos para string, foram limpos e tipados corretamente, dando origem à três tabelas: pld_horario, balanco_energia e balanco_energia_sin. O dicionário completo desta camada, com a descrição de cada coluna, está disponível em [Dicionário de Dados - Silver](https://github.com/Th1ago01/MVP_ENGENHARIA-DE-DADOS/blob/main/Dicion%C3%A1rio_silver.pdf).
+Na camada **Silver**, os dados brutos, e que haviam sido convertidos para string, foram limpos e tipados corretamente, dando origem à três tabelas: pld_horario, balanco_energia e balanco_energia_sin. O dicionário completo desta camada, com a descrição de cada coluna, está disponível em [Dicionário de Dados - Silver](https://github.com/Th1ago01/MVP_ENGENHARIA-DE-DADOS/blob/main/Dicion%C3%A1rio_silver.pdf).
 
-Na camada Gold, os dados foram reorganizados em um modelo **star schema**, composto por duas tabelas dimensão, dim_subsistema e dim_tempo, e três tabelas de fato no grão original: fact_pld_horario, fact_geracao_carga e fact_geracao_carga_sin.
+Na camada **Gold**, os dados foram reorganizados em um modelo **star schema**, composto por duas tabelas dimensão, dim_subsistema e dim_tempo, e três tabelas de fato no grão original: fact_pld_horario, fact_geracao_carga e fact_geracao_carga_sin.
 Adicionalmente, foram criadas duas tabelas agregadas com algumas métricas estipuladas a fim de responder as perguntas deste projeto: agg_intercambio_preco, tabela essa que resume o papel de cada submercado, exportador ou importador, e o spread (diferença) de PLD em relação ao Sudeste; e agg_impacto_fonte, tabela essa que busca medir a associação entre a geração por tipo de fonte e as variações do PLD. O dicionário de dados completo da camada Gold está disponível em [Dicionário de Dados - Gold](https://github.com/Th1ago01/MVP_ENGENHARIA-DE-DADOS/blob/main/Dicion%C3%A1rio_gold.pdf).
 
 O passo a passo para a confecção de cada uma dessas camadas pode ser observada em [Estrutura Medallion - Silver](https://github.com/Th1ago01/MVP_ENGENHARIA-DE-DADOS/blob/main/MVP%20-%20PUC%20RIO%20SILVER%20LAYER.ipynb) e [Estrutura Medallion - Gold](https://github.com/Th1ago01/MVP_ENGENHARIA-DE-DADOS/blob/main/MVP%20-%20PUC%20RIO%20GOLD%20LAYER.ipynb)
+
+### **4 - Pipeline de Dados**
