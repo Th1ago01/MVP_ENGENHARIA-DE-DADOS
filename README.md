@@ -27,13 +27,26 @@ Em todos os casos, os dados foram normalizados para tipo string para evitar conf
 <img width="265" height="734" alt="image" src="https://github.com/user-attachments/assets/a7a56c9f-6351-4eb1-ab13-d356d3565b1f" />
 
 ### **3 - Modelagem e Catálogo de Dados**
-A modelagem dos dados foi estruturada nas camadas seguintes à Bronze, respeitando a arquitetura Medallion, nas camadas Silver e Gold. 
+A modelagem dos dados foi estruturada nas camadas seguintes à Bronze, respeitando a arquitetura Medallion, nas camadas Silver e Gold. Nesse processo, fez-se uso da função "catalog" dentro do Databricks e criação de schemas representando cada uma das etapas e abrigando cada uma das tabelas pertinentes a cada momento.
 
 Na camada **Silver**, os dados brutos, e que haviam sido convertidos para string, foram limpos e tipados corretamente, dando origem à três tabelas: pld_horario, balanco_energia e balanco_energia_sin. O dicionário completo desta camada, com a descrição de cada coluna, está disponível em [Dicionário de Dados - Silver](https://github.com/Th1ago01/MVP_ENGENHARIA-DE-DADOS/blob/main/Dicion%C3%A1rio_silver.pdf).
 
 Na camada **Gold**, os dados foram reorganizados em um modelo **star schema**, composto por duas tabelas dimensão, dim_subsistema e dim_tempo, e três tabelas de fato no grão original: fact_pld_horario, fact_geracao_carga e fact_geracao_carga_sin.
 Adicionalmente, foram criadas duas tabelas agregadas com algumas métricas estipuladas a fim de responder as perguntas deste projeto: agg_intercambio_preco, tabela essa que resume o papel de cada submercado, exportador ou importador, e o spread (diferença) de PLD em relação ao Sudeste; e agg_impacto_fonte, tabela essa que busca medir a associação entre a geração por tipo de fonte e as variações do PLD. O dicionário de dados completo da camada Gold está disponível em [Dicionário de Dados - Gold](https://github.com/Th1ago01/MVP_ENGENHARIA-DE-DADOS/blob/main/Dicion%C3%A1rio_gold.pdf).
 
-O passo a passo para a confecção de cada uma dessas camadas pode ser observada em [Estrutura Medallion - Silver](https://github.com/Th1ago01/MVP_ENGENHARIA-DE-DADOS/blob/main/MVP%20-%20PUC%20RIO%20SILVER%20LAYER.ipynb) e [Estrutura Medallion - Gold](https://github.com/Th1ago01/MVP_ENGENHARIA-DE-DADOS/blob/main/MVP%20-%20PUC%20RIO%20GOLD%20LAYER.ipynb)
+Abaixo está uma imagem de como ficou estruturado o catalog "portfolio_energia" criado para abrigar este projeto no Databricks.
+
+<img width="396" height="438" alt="image" src="https://github.com/user-attachments/assets/42b08145-0e83-420d-b59b-fd3922476ab8" />
+
 
 ### **4 - Pipeline de Dados**
+O pipeline ETL foi estruturado em três notebooks, uma para cada uma das camadas da arquitetura Medallion. 
+
+Essa tomada de decisão se deve ao fato de que cada camada, e consequentemente notebook, possuem uma responsabilidade distinta: ingestão da fonte (Bronze), limpeza e padronização (Silver), modelagem dimensional e agregação de métricas (Gold). Além disso, em casos de falhas no processo, essa divisão torna mais fácil achar a origem do problema. 
+
+Os notebooks estão versionados nese diretório conforme pontos abaixo:
+- [CAMADA BRONZE](https://github.com/Th1ago01/MVP_ENGENHARIA-DE-DADOS/blob/main/MVP%20-%20PUC%20RIO%20BRONZE%20LAYER.ipynb) - ingestão dos dados da ONS e CCEE por meio de API.
+- [CAMADA SILVER](https://github.com/Th1ago01/MVP_ENGENHARIA-DE-DADOS/blob/main/MVP%20-%20PUC%20RIO%20SILVER%20LAYER.ipynb) - transformação e tipagem dos dados de forma correta, além de verificações de qualidade após estas transformações, se certificando que nenhum dado havia sido perdido.
+- [CAMADA GOLD](https://github.com/Th1ago01/MVP_ENGENHARIA-DE-DADOS/blob/main/MVP%20-%20PUC%20RIO%20GOLD%20LAYER.ipynb) - separação em tabelas fato ("fact_"), tabelas dimensão ("dim_"), tabelas de métricas ("agg_"). 
+
+
