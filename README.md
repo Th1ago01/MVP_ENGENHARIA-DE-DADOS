@@ -20,14 +20,12 @@ O processo completo foi realizado consumindo recursos específicos da CCEE e da 
 
 **2.2 - Dados horários de PLD (2021–2026)**: dados horários obtidos via API pública de dados abertos da CCEE (https://dadosabertos.ccee.org.br/dataset/pld_horario). Para esta etapa, foi necessário utilizar a biblioteca "curl_cffi" do Python, pois a API da CCEE bloqueia requisições HTTP convencionais por medidas de proteção. Essa hipótese foi testada quando um mesmo request que tentei realizar funcionava no **Postman**, mas não em minha máquina local em editores de código como Visual Studio Code (VsCode) ou editores da nuvem (DataBricks);
 
-**2.3 - Dados semanais históricos do PLD (2001-2020)**: dados do PLD no formato semanal, também ingeridos por API. Esse dataset se refere a um período em que o PLD possuía uma metodologia de cálculo diferente da praticada a partir de 2021.
+**2.3 - Dados semanais históricos do PLD (2001-2020)**: dados do PLD no formato semanal, também ingeridos por API. Esse dataset se refere a um período em que o PLD possuía uma metodologia de cálculo diferente da praticada a partir de 2021. Durante a elaboração da camada SILVER e ponderando como seria realizada a integração na camada GOLD, foi decidido não utilizar este dataset visto que além da divergência de granularidade aos outros datasets, a divergência na memória de cálculo dos valores apurados poderia contaminar a análise final do trabalho.
 
-Em todos os casos, os dados foram normalizados para tipo string para evitar conflitos de schema entre lotes que estavam acontecendo. Abaixo, está a forma como foi organizado o catálogo, schema e as respectivas tabelas e suas colunas:
-
-<img width="265" height="734" alt="image" src="https://github.com/user-attachments/assets/a7a56c9f-6351-4eb1-ab13-d356d3565b1f" />
+Em todos os casos, os dados foram normalizados para tipo string para evitar conflitos de schema entre lotes que estavam acontecendo. 
 
 ### **3 - Modelagem e Catálogo de Dados**
-A modelagem dos dados foi estruturada nas camadas seguintes à Bronze, respeitando a arquitetura Medallion, nas camadas Silver e Gold. Nesse processo, fez-se uso da função "catalog" dentro do Databricks e criação de schemas representando cada uma das etapas e abrigando cada uma das tabelas pertinentes a cada momento.
+A modelagem dos dados foi estruturada nas camadas seguintes à Bronze, respeitando a arquitetura Medallion, nas camadas Silver e Gold. Nesse processo, fez-se uso da funcionalidade "catalog" dentro do Databricks e criação de schemas representando cada uma das etapas e abrigando cada uma das tabelas pertinentes a cada momento.
 
 Na camada **Silver**, os dados brutos, e que haviam sido convertidos para string, foram limpos e tipados corretamente, dando origem à três tabelas: pld_horario, balanco_energia e balanco_energia_sin. O dicionário completo desta camada, com a descrição de cada coluna, está disponível em [Dicionário de Dados - Silver](https://github.com/Th1ago01/MVP_ENGENHARIA-DE-DADOS/blob/main/Dicion%C3%A1rio_silver.pdf).
 
@@ -38,15 +36,28 @@ Abaixo está uma imagem de como ficou estruturado o catalog "portfolio_energia" 
 
 <img width="396" height="438" alt="image" src="https://github.com/user-attachments/assets/42b08145-0e83-420d-b59b-fd3922476ab8" />
 
-
 ### **4 - Pipeline de Dados**
 O pipeline ETL foi estruturado em três notebooks, uma para cada uma das camadas da arquitetura Medallion. 
 
-Essa tomada de decisão se deve ao fato de que cada camada, e consequentemente notebook, possuem uma responsabilidade distinta: ingestão da fonte (Bronze), limpeza e padronização (Silver), modelagem dimensional e agregação de métricas (Gold). Além disso, em casos de falhas no processo, essa divisão torna mais fácil achar a origem do problema. 
+Essa tomada de decisão se deve ao fato de que cada camada, e consequentemente notebook, possuem uma responsabilidade distinta: ingestão da fonte (Bronze), limpeza e padronização (Silver), modelagem dimensional e agregação de métricas (Gold). Além disso, em casos de falhas no processo, essa divisão torna mais fácil encontrar a origem do problema. 
 
-Os notebooks estão versionados nese diretório conforme pontos abaixo:
+Os notebooks estão versionados nesse diretório conforme pontos abaixo:
 - [CAMADA BRONZE](https://github.com/Th1ago01/MVP_ENGENHARIA-DE-DADOS/blob/main/MVP%20-%20PUC%20RIO%20BRONZE%20LAYER.ipynb) - ingestão dos dados da ONS e CCEE por meio de API.
-- [CAMADA SILVER](https://github.com/Th1ago01/MVP_ENGENHARIA-DE-DADOS/blob/main/MVP%20-%20PUC%20RIO%20SILVER%20LAYER.ipynb) - transformação e tipagem dos dados de forma correta, além de verificações de qualidade após estas transformações, se certificando que nenhum dado havia sido perdido.
-- [CAMADA GOLD](https://github.com/Th1ago01/MVP_ENGENHARIA-DE-DADOS/blob/main/MVP%20-%20PUC%20RIO%20GOLD%20LAYER.ipynb) - separação em tabelas fato ("fact_"), tabelas dimensão ("dim_"), tabelas de métricas ("agg_"). 
+- [CAMADA SILVER](https://github.com/Th1ago01/MVP_ENGENHARIA-DE-DADOS/blob/main/MVP%20-%20PUC%20RIO%20SILVER%20LAYER.ipynb) - transformação e tipagem dos dados de forma correta, além de verificações de qualidade após estas transformações, se certificando de que nenhum dado havia sido perdido.
+- [CAMADA GOLD](https://github.com/Th1ago01/MVP_ENGENHARIA-DE-DADOS/blob/main/MVP%20-%20PUC%20RIO%20GOLD%20LAYER.ipynb) - separação em tabelas fato ("fact_"), tabelas dimensão ("dim_"), tabelas de métricas ("agg_").
+
+Abaixo estão imagens retiradas diretamente da plataforma Databricks, com as tabelas pertencentes a cada momento do projeto, assim como suas colunas e os tipos de dados aceitos em cada uma delas: 
+
+**BRONZE**
+
+<img width="285" height="649" alt="image" src="https://github.com/user-attachments/assets/b34da385-3fd8-482f-961b-746a5f56cf70" />
+
+**SILVER**
+
+<img width="347" height="876" alt="image" src="https://github.com/user-attachments/assets/fce6f9c0-ef31-4ea1-b7c6-4800c28cca07" />
+
+**GOLD**
+
+<img width="299" height="766" alt="image" src="https://github.com/user-attachments/assets/87e51e6b-bc5d-4b26-b9ef-64753721e2ff" /> <img width="301" height="492" alt="image" src="https://github.com/user-attachments/assets/04782ed7-e917-4a13-a389-1054501ebc20" />
 
 
