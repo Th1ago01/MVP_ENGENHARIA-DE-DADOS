@@ -1,4 +1,4 @@
-# MVP_ENGENHARIA-DE-DADOS
+# MVP - ENGENHARIA DE DADOS
 Este é um repositório para alocar o MVP de Engenharia de Dados da PUC-RIO. 
 
 O MVP tem como tema o mercado de energia, mais especificamente o Ambiente de Contratação Livre (ACL), e busca analisar se é possível estabelecer uma relação entre o preço da energia, Preço da Liquidação das Diferenças (PLD), e os níveis de geração de usinas em território brasileiro, além de buscar evidenciar se existe alguma usina que possui maior causalidade ou correlação quando o preço da energia se encontra elevado.
