@@ -60,4 +60,24 @@ Abaixo estão imagens retiradas diretamente da plataforma Databricks, com as tab
 
 <img width="299" height="766" alt="image" src="https://github.com/user-attachments/assets/87e51e6b-bc5d-4b26-b9ef-64753721e2ff" /> <img width="301" height="492" alt="image" src="https://github.com/user-attachments/assets/04782ed7-e917-4a13-a389-1054501ebc20" />
 
+### **5 - Qualidade de Dados**
+Para este projeto, devido à disponibilização dos dados em plataformas abertas e a manutenção constante por instituições robustas (CCEE e ONS), aferir a qualidade dos dados não se provou uma tarefa complexa.
+
+Durante o projeto, foram realizadas transformações apenas para garantir o formato correto das colunas após a ingestão na camada Bronze e a checagem de que não existiam duplicatas na ingestão ou a perda de dados no processo de transformação.
+Isso se deu, pois, conforme elencado anteriormente, na camada Bronze todas as tabelas possuem seus valores em tipo string para evitar o conflito de salvamento de schemas que estava acontecendo entre lotes de exeução; por outro lado, foram realizadas as checagens de duplicatas para garantir que a cada ingestão de dados a camada Bronze estava sendo corretamente atualizada. E, por último, foi feita a checagem de que nenhuma mudança na tipagem das colunas pudesse ter causado a perda de algum dado.
+
+Por mais que tenham sido constatados valores nulos da camada Bronze, especialmente na tabela **ons_balanco_energia_subsistema**, que posteriormente originou as tabelas **balanco_energia** e **balanco_energia_sin** na camada Silver, esses valores nulos significam a realidade da operação e não uma anomalia: valores de geração solar nula ou muito próximas de zero são aceitáveis, visto que tratando-se do contexto é uma fonte de energia que deixa de produzir em períodos noturnos. Abaixo, uma mostra para exemplificar este fato:
++-------------+----------------------------+-------------------+-----------------+--------------+-------------+------------+--------------+---------------+
+|id_subsistema|nom_subsistema              |din_instante       |val_gerhidraulica|val_gertermica|val_gereolica|val_gersolar|val_carga     |val_intercambio|
++-------------+----------------------------+-------------------+-----------------+--------------+-------------+------------+--------------+---------------+
+|S            |SUL                         |2006-09-03 23:00:00|2176.15000000    |1288.61000000 |45.50000000  |0E-8        |5972.70000000 |-2462.44000000 |
+|NE           |NORDESTE                    |2006-09-04 00:00:00|6198.74000000    |153.16999999  |22.72000000  |0E-8        |6364.99000000 |9.64000000     |
+|N            |NORTE                       |2006-09-04 00:00:00|2263.17000000    |0E-8          |0E-8         |0E-8        |3363.99000000 |-1100.82000000 |
+|SIN          |SISTEMA INTERLIGADO NACIONAL|2006-09-04 00:00:00|34016.30000000   |4338.74000000 |64.19000000  |NULL        |38392.02000000|27.21000000    |
+|SE           |SUDESTE/CENTRO-OESTE        |2006-09-04 00:00:00|23832.19999999   |2895.37000000 |0E-8         |0E-8        |23169.64999999|3557.92000000  |
++-------------+----------------------------+-------------------+-----------------+--------------+-------------+------------+--------------+---------------+
+
+### **6 - Análise de Dados**
+
+
 
