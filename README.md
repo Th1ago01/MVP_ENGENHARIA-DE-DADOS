@@ -6,7 +6,7 @@ O MVP tem como tema o mercado de energia, mais especificamente o Ambiente de Con
 Foi utilizada a plataforma DataBricks para manutenção dos Notebooks, desde à ingestão dos dados e desenvolvimento da arquitetura Medallion, até o momento da análise final e plotagem dos gráficos.
 
 ### **1 - Contexto de Negócios e Perguntas**
-Para este trabalho, foram feitos os seguintes questionamentos: **Como o intercâmbio entre submercados afeta o preço da energia e qual o tipo de usina que mais impacta o preço do PLD com as suas variações de geração, sejam altas ou baixas?**
+Para este trabalho, foram feitos os seguintes questionamentos: **Como o intercâmbio entre submercados afeta o preço da energia, qual o tipo de usina que mais impacta o preço do PLD com as suas variações de geração e se é possível determinar uma fonte que mais impacta cada submercado.**
 
 Em um ambiente de mercado competitivo, o preço que se paga pela energia deixa de ser apenas um insumo e se torna algo estratégico; uma empresa que é capaz de identificar isso reduz seus gastos e é capaz de dedicar recursos a outras partes de sua produção. Nesse sentido, ser capaz de identificar padrões e entender a dinâmica do preço da energia e os fatores que o rodeam se torna um diferencial para o planejamento a médio e longo prazo. 
 
@@ -77,6 +77,59 @@ Por mais que tenham sido constatados valores nulos da camada Bronze, especialmen
 | SE | SUDESTE/CENTRO-OESTE | 2006-09-04 00:00:00 | 23832.19999999 | 2895.37000000 | 0E-8 | 0E-8 | 23169.64999999 | 3557.92000000 |
 
 ### **6 - Análise de Dados**
+
+Para esta etapa, foram realizadas consultas em SQL no ambiente do DataBricks para tentar responder às perguntas elencadas no início deste trabalho. O notebook com essas consultas pode ser visualizado **aqui**.
+
+- Como o intercâmbio afeta o preço?
+
+O Sudeste/Centro-Oeste (SE) foi adotado como referência, por ser o maior centro de carga do sistema. O spread mede a diferença entre o PLD de cada submercado e o PLD do SE. O percentual de horas descoladas indica com que frequência os preços deixaram de ser iguais.
+
+Os resultados mostram que o papel no intercâmbio está associado à posição do preço em relação ao SE. Quando o Norte exporta energia, seu PLD fica em média R$ 18,45/MWh abaixo do SE, com 19,6% das horas descoladas. Quando importa, o spread é praticamente nulo. O Nordeste segue o mesmo padrão como exportador, com spread médio de −R$ 15,24/MWh e 22,8% das horas descoladas. O Sul se comporta de forma oposta: nos períodos em que importa, seu PLD fica em média R$ 5,88/MWh acima do SE, e o PLD médio chega a R$ 176,95/MWh, o maior da tabela.
+
+| id_subsistema | papel_intercambio | pld_medio | spread_medio_se | pct_horas_descoladas |
+|:---:|:---|---:|---:|---:|
+| N | EXPORTADOR | 148.55 | -18.45 | 19.63 |
+| N | IMPORTADOR | 150.28 | -0.05 | 11.72 |
+| NE | EXPORTADOR | 151.05 | -15.24 | 22.78 |
+| NE | IMPORTADOR | 117.22 | -11.58 | 23.10 |
+| S | EXPORTADOR | 142.82 | -0.11 | 8.39 |
+| S | IMPORTADOR | 176.95 | 5.88 | 13.19 |
+
+- Qual fonte mais impacta o PLD e cada submercado?
+
+Para cada fonte, foi calculado o desvio médio do PLD nas horas em que a geração estava alta e nas horas em que estava baixa. O impacto é a diferença entre esses dois desvios e indica quanto o preço muda conforme a geração da fonte varia.
+
+No conjunto do sistema, a fonte térmica apresentou o maior impacto médio, de R$ 16,57/MWh. Nos períodos de geração térmica alta, o PLD ficou em média R$ 7,92/MWh acima do baseline; nos de geração baixa, R$ 7,99/MWh abaixo. A hidráulica fica em segunda lugar, com impacto de R$ 14,49/MWh, depois a solar (R$ 10,66/MWh) e, por último, a eólica (R$ 5,74/MWh). A eólica foi a única fonte em que geração alta coincidiu com PLD ligeiramente abaixo da média, o que indica uma leve tendência de redução de preço quando há mais vento.
+
+Por submercado, a térmica é a mais impactante no Norte (R$ 24,80/MWh) e no Nordeste (R$ 15,77/MWh). No Nordeste, porém, a solar aparece muito próxima (R$ 15,03/MWh). No Sul e no Sudeste, a hidráulica é a fonte de maior impacto (R$ 16,58/MWh e R$ 20,03/MWh), o que é coerente com a forte presença de grandes reservatórios nessas regiões.
+
+Entretanto, é importante entender o impacto das térmicas de forma clara. As usinas térmicas têm custo de operação mais alto e são acionadas justamente quando o preço já está elevado, em geral em períodos de pouca chuva ou de demanda alta. Por isso, a relação observada indica que geração térmica alta e PLD alto andam juntos, mas não que a térmica seja a causa da alta do preço. O mais preciso é dizer que a geração térmica é o melhor indicador de períodos de PLD elevado.
+
+| fonte | desvio_geracao_alta | desvio_geracao_baixa | impacto_medio |
+|:---|---:|---:|---:|
+| TERMICA | 7.92 | -7.99 | 16.57 |
+| HIDRAULICA | 6.55 | -6.52 | 14.49 |
+| SOLAR | 2.61 | -2.87 | 10.66 |
+| EOLICA | -0.16 | 0.36 | 5.74 |
+
+| id_subsistema | fonte | impacto_medio |
+|:---:|:---|---:|
+| N | TERMICA | 24.80 |
+| N | HIDRAULICA | 9.34 |
+| N | EOLICA | 6.71 |
+| N | SOLAR | 5.61 |
+| NE | TERMICA | 15.77 |
+| NE | SOLAR | 15.03 |
+| NE | HIDRAULICA | 11.99 |
+| NE | EOLICA | 8.08 |
+| S | HIDRAULICA | 16.58 |
+| S | TERMICA | 12.08 |
+| S | SOLAR | 10.76 |
+| S | EOLICA | 2.78 |
+| SE | HIDRAULICA | 20.03 |
+| SE | TERMICA | 13.61 |
+| SE | SOLAR | 8.94 |
+| SE | EOLICA | 4.53 |
 
 
 
