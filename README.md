@@ -3,7 +3,7 @@ Este é um repositório para alocar o MVP de Engenharia de Dados da PUC-RIO.
 
 O MVP tem como tema o mercado de energia, mais especificamente o Ambiente de Contratação Livre (ACL), e busca analisar se é possível estabelecer uma relação entre o preço da energia, Preço da Liquidação das Diferenças (PLD), e os níveis de geração de usinas em território brasileiro, além de buscar evidenciar se existe alguma usina que possui maior causalidade ou correlação quando o preço da energia se encontra elevado.
 
-Foi utilizada a plataforma DataBricks para manutenção dos Notebooks, desde à ingestão dos dados e desenvolvimento da arquitetura Medallion, até o momento da análise final e plotagem dos gráficos.
+Foi utilizada a plataforma DataBricks para manutenção dos Notebooks, desde à ingestão dos dados e desenvolvimento da arquitetura Medallion, até o momento da análise final.
 
 ### **1 - Contexto de Negócios e Perguntas**
 Para este trabalho, foram feitos os seguintes questionamentos: **Como o intercâmbio entre submercados afeta o preço da energia, qual o tipo de usina que mais impacta o preço do PLD com as suas variações de geração e se é possível determinar uma fonte que mais impacta cada submercado.**
