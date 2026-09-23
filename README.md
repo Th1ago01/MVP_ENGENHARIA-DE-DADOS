@@ -78,13 +78,15 @@ Por mais que tenham sido constatados valores nulos da camada Bronze, especialmen
 
 ### **6 - Análise de Dados**
 
-Para esta etapa, foram realizadas consultas em SQL no ambiente do DataBricks para tentar responder às perguntas elencadas no início deste trabalho. O notebook com essas consultas pode ser visualizado **aqui**.
+Para esta etapa, foram realizadas consultas em SQL no ambiente do DataBricks para tentar responder às perguntas elencadas no início deste trabalho. O notebook com essas consultas pode ser visualizado [**aqui**](https://github.com/Th1ago01/MVP_ENGENHARIA-DE-DADOS/blob/main/MVP%20-%20AN%C3%81LISE%20DAS%20PERGUNTAS.ipynb).
 
 - Como o intercâmbio afeta o preço?
 
-O Sudeste/Centro-Oeste (SE) foi adotado como referência, por ser o maior centro de carga do sistema. O spread mede a diferença entre o PLD de cada submercado e o PLD do SE. O percentual de horas descoladas indica com que frequência os preços deixaram de ser iguais.
+O Sudeste/Centro-Oeste (SE) foi adotado como referência, por ser o maior centro de carga do sistema. **O spread mede a diferença entre o PLD de cada submercado e o PLD do SE**. O percentual de horas descoladas indica com que frequência os preços deixaram de ser iguais.
 
-Os resultados mostram que o papel no intercâmbio está associado à posição do preço em relação ao SE. Quando o Norte exporta energia, seu PLD fica em média R$ 18,45/MWh abaixo do SE, com 19,6% das horas descoladas. Quando importa, o spread é praticamente nulo. O Nordeste segue o mesmo padrão como exportador, com spread médio de −R$ 15,24/MWh e 22,8% das horas descoladas. O Sul se comporta de forma oposta: nos períodos em que importa, seu PLD fica em média R$ 5,88/MWh acima do SE, e o PLD médio chega a R$ 176,95/MWh, o maior da tabela.
+Os resultados mostram que o papel no intercâmbio está associado à posição do preço em relação ao SE. Quando o Norte exporta energia, seu PLD fica em média R$ 18,45/MWh abaixo do SE, com 19,6% das horas descoladas. Quando importa, o spread é praticamente nulo. O Nordeste segue o mesmo padrão como exportador, com spread médio de −R$ 15,24/MWh e 22,8% das horas descoladas. O Sul se comporta de forma parecida, porém mais extrema: nos períodos em que importa, seu PLD fica em média R$ 5,88/MWh acima do SE, e o PLD médio chega a R$ 176,95/MWh, o maior da tabela.
+
+Nesse sentido, pode-se concluir que quando cada um dos submercados atua como exportador no Sistema Interligado Nacional, há a redução do PLD nestas regiões em comparação ao PLD observado no Sudeste/Centro-Oeste. Além disso, é possível observar que o submercado Sul é o mais impactado negativamente com as mudanças de papel no intercâmbio: quando exportador, a diferença para o PLD do SE é quase nula; quando importador, é o submercado que apresenta o maior aumento de preço em relação ao submercado base.
 
 | id_subsistema | papel_intercambio | pld_medio | spread_medio_se | pct_horas_descoladas |
 |:---:|:---|---:|---:|---:|
@@ -103,7 +105,7 @@ No conjunto do sistema, a fonte térmica apresentou o maior impacto médio, de R
 
 Por submercado, a térmica é a mais impactante no Norte (R$ 24,80/MWh) e no Nordeste (R$ 15,77/MWh). No Nordeste, porém, a solar aparece muito próxima (R$ 15,03/MWh). No Sul e no Sudeste, a hidráulica é a fonte de maior impacto (R$ 16,58/MWh e R$ 20,03/MWh), o que é coerente com a forte presença de grandes reservatórios nessas regiões.
 
-Entretanto, é importante entender o impacto das térmicas de forma clara. As usinas térmicas têm custo de operação mais alto e são acionadas justamente quando o preço já está elevado, em geral em períodos de pouca chuva ou de demanda alta. Por isso, a relação observada indica que geração térmica alta e PLD alto andam juntos, mas não que a térmica seja a causa da alta do preço. O mais preciso é dizer que a geração térmica é o melhor indicador de períodos de PLD elevado.
+Entretanto, é importante entender o impacto das térmicas de forma clara. As usinas térmicas têm custo de operação mais alto e são acionadas justamente quando o preço está com a tendência de se elevar, em geral em períodos de pouca chuva que acabam por reduzir o nível dos reservatórios ou de demanda alta muito alta e pouca geração. Por isso, a relação observada indica que geração térmica alta e PLD alto andam juntos, mas não que a térmica seja a causa da alta do preço. O mais preciso é dizer que a geração térmica é o melhor indicador de períodos de PLD elevado.
 
 | fonte | desvio_geracao_alta | desvio_geracao_baixa | impacto_medio |
 |:---|---:|---:|---:|
@@ -130,6 +132,22 @@ Entretanto, é importante entender o impacto das térmicas de forma clara. As us
 | SE | TERMICA | 13.61 |
 | SE | SOLAR | 8.94 |
 | SE | EOLICA | 4.53 |
+
+### **7 - Autoavaliação**
+
+Neste trabalho, a arquitetura Medallion cumpriu bem o seu papel de separar as responsabilidades de forma clara. Além disso, optar por métricas simples, como spread em relação ao submercado SE e desvio do PLD em horas de geração alta e baixa, deixou os resultados fáceis de interpretar, o que torna o trabalho mais fácil de ler e entender para indivíduos que não possuem experiência no setor elétrico. 
+
+Contudo, de forma objetiva, a principal limitação analítica deste trabalho é que os resultados, em realidade, demonstram associação e não causalidade. O caso da geração térmica ilustra isso: ela aparece como a fonte de maior impacto, mas é acionada justamente quando o preço já está em tendência de subida. Para separar causa de associação, seria necessário incluir as variáveis que de fato formam o PLD e que ficaram de fora do projeto:
+
+- Nível dos reservatórios e a Energia Natural Afluente (ENA)
+- A carga de energia
+- O Custo Marginal de Operação (CMO)
+
+Além disso, o trabalho também leva em consideração os anos de 2022 e 2023 que, historicamente, possuíram preço do PLD muito próximo do piso durante boa parte do tempo, o que eliminou a variação e reduziu o impacto medido de todas as fontes nesses anos; de certa forma, isso pode ter contaminado as métricas deste trabalho e, caso excluídos esses períodos, seriam observados uma médica de impactos maiores.
+
+Por último, a métrica de impacto por fonte é uma simplificação. Ela somente divide as horas em geração "alta" e "baixa" e compara o preço entre os dois grupos. Poderiam ter sido aplicados métodos estatísticos de regração que permitiriam medir o efeito de cada fonte de forma mais acurada.
+
+Agradeço pelo tempo dedicado à leitura deste repositório e espero que tenha gostado.
 
 
 
