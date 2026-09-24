@@ -143,7 +143,7 @@ Contudo, de forma objetiva, a principal limitação analítica deste trabalho é
 - A carga de energia
 - O Custo Marginal de Operação (CMO)
 
-Além disso, o trabalho também leva em consideração os anos de 2022 e 2023 que, historicamente, possuíram preço do PLD muito próximo do piso durante boa parte do tempo, o que eliminou a variação e reduziu o impacto medido de todas as fontes nesses anos; de certa forma, isso pode ter contaminado as métricas deste trabalho e, caso excluídos esses períodos, seriam observados uma médica de impactos maiores.
+Além disso, o trabalho também leva em consideração os anos de 2022 e 2023 que, historicamente, possuíram preço do PLD muito próximo do piso durante boa parte do tempo, o que eliminou a variação e reduziu o impacto medido de todas as fontes nesses anos; de certa forma, isso pode ter contaminado as métricas deste trabalho e, caso excluídos esses períodos, seriam observados uma média de impactos maiores.
 
 Por último, a métrica de impacto por fonte é uma simplificação. Ela somente divide as horas em geração "alta" e "baixa" e compara o preço entre os dois grupos. Poderiam ter sido aplicados métodos estatísticos de regração que permitiriam medir o efeito de cada fonte de forma mais acurada.
 
